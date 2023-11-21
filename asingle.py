@@ -78,6 +78,88 @@ class Map(object):
                 while(self.path[0].parent!=None):
                     self.path.insert(0,self.path[0].parent)
                 break
+    def doubleasingle(self,start,end):
+        dir=[[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]
+        openlist1=[]
+        closelist=[]
+        openlist1.append(start)
+        openlist2=[]
+        openlist2.append(end)
+        finish=False
+        parent=start
+        while(1):
+            minfP=self.searchminF(openlist1)
+            openlist1.remove(minfP)
+            closelist.append(minfP)
+            for i in range(8):
+                x=minfP.x+dir[i][0]
+                y=minfP.y+dir[i][1]
+                if(0<=x<len(self.map) and 0<=y<len(self.map[0]) and self.map[x][y].wall!=True and self.map[x][y] not in closelist):
+                    if self.map[x][y] in openlist2:
+                        finish=True
+                        parent=self.map[x][y].parent
+                        connect=self.map[x][y]
+                    if(self.map[x][y] not in openlist1):
+                        if minfP.x==x or minfP.y==y:
+                            self.map[x][y].G=minfP.G+1
+                        else:
+                            self.map[x][y].G=minfP.G+math.sqrt(2)
+                        self.map[x][y].H=min(abs(x-end.x),abs(y-end.y))*math.sqrt(2)+abs(abs(x-end.x)-abs(y-end.y))
+                        self.map[x][y].F=self.map[x][y].G+self.map[x][y].H
+                        self.map[x][y].parent=minfP
+                        openlist1.append(self.map[x][y])
+                    else:
+                        if minfP.x==x or minfP.y==y:
+                            changeG=minfP.G+1
+                        else:
+                            changeG=minfP.G+math.sqrt(2)
+                        if(self.map[x][y].G>changeG):
+                            openlist1.remove(self.map[x][y])
+                            self.map[x][y].G=changeG
+                            self.map[x][y].F=self.map[x][y].G+self.map[x][y].H
+                            self.map[x][y].parent=minfP
+                            openlist1.append(self.map[x][y])
+            if(finish): break
+            minfP=self.searchminF(openlist2)
+            openlist2.remove(minfP)
+            closelist.append(minfP)
+            for i in range(8):
+                x=minfP.x+dir[i][0]
+                y=minfP.y+dir[i][1]
+                if(0<=x<len(self.map) and 0<=y<len(self.map[0]) and self.map[x][y].wall!=True and self.map[x][y] not in closelist):
+                    if self.map[x][y] in openlist1:
+                        finish=True
+                        parent=self.map[x][y].parent
+                        connect=self.map[x][y]
+                    if(self.map[x][y] not in openlist2):
+                        if minfP.x==x or minfP.y==y:
+                            self.map[x][y].G=minfP.G+1
+                        else:
+                            self.map[x][y].G=minfP.G+math.sqrt(2)
+                        self.map[x][y].H=min(abs(x-start.x),abs(y-start.y))*math.sqrt(2)+abs(abs(x-start.x)-abs(y-start.y))
+                        self.map[x][y].F=self.map[x][y].G+self.map[x][y].H
+                        self.map[x][y].parent=minfP
+                        openlist2.append(self.map[x][y])
+                    else:
+                        if minfP.x==x or minfP.y==y:
+                            changeG=minfP.G+1
+                        else:
+                            changeG=minfP.G+math.sqrt(2)
+                        if(self.map[x][y].G>changeG):
+                            openlist2.remove(self.map[x][y])
+                            self.map[x][y].G=changeG
+                            self.map[x][y].F=self.map[x][y].G+self.map[x][y].H
+                            self.map[x][y].parent=minfP 
+                            openlist2.append(self.map[x][y])
+            if(finish): break
+        self.path.insert(0,connect)
+        while(self.path[0].parent!=None):
+            self.path.insert(0,self.path[0].parent)
+        self.path.append(parent)
+        while(self.path[-1].parent!=None):
+            self.path.append(self.path[-1].parent)
+                    
+                
     def show(self):
         wallx=[]
         wally=[]
@@ -106,7 +188,7 @@ class Map(object):
    
 wall=[[6,7],[6,8],[7,6],[7,5],[7,4],[8,4],[8,3],[8,2]]                   
 map=Map(17,14,wall)
-map.asingle(map.map[4][5],map.map[13][4])
+map.doubleasingle(map.map[4][5],map.map[13][4])
 map.show()
 
 
